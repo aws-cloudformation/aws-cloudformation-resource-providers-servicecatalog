@@ -22,4 +22,3 @@ Resources:
       Runtime: java8
       MemorySize: 256
       CodeUri: ./target/aws-servicecatalog-serviceactionassociation-1.0.jar
-

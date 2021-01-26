@@ -1,62 +1,62 @@
 {
-    "typeName": "AWS::ServiceCatalog::ServiceActionAssociation",
-    "description": "Resource Schema for AWS::ServiceCatalog::ServiceActionAssociation",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-    "properties": {
-        "ProductId": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
-            "minLength": 1,
-            "maxLength": 100
-        },
-        "ProvisioningArtifactId": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
-            "minLength": 1,
-            "maxLength": 100
-        },
-        "ServiceActionId": {
-            "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
-            "minLength": 1,
-            "maxLength": 100
-        },
-        "Id": {
-            "type": "string"
-        }
+  "typeName": "AWS::ServiceCatalog::ServiceActionAssociation",
+  "description": "Resource Schema for AWS::ServiceCatalog::ServiceActionAssociation",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "ProductId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
+      "minLength": 1,
+      "maxLength": 100
     },
-    "additionalProperties": false,
-    "required": [
-        "ProductId",
-        "ProvisioningArtifactId",
-        "ServiceActionId"
-    ],
-    "createOnlyProperties" : [
-        "/properties/ProductId",
-        "/properties/ProvisioningArtifactId",
-        "/properties/ServiceActionId"
-    ],
-    "readOnlyProperties": [
-        "/properties/Id"
-    ],
-    "primaryIdentifier": [
-        "/properties/Id"
-    ],
-    "handlers": {
-        "create": {
-            "permissions": [
-                "servicecatalog:AssociateServiceActionWithProvisioningArtifact"
-            ]
-        },
-        "read": {
-            "permissions": [
-                "servicecatalog:ListServiceActionsForProvisioningArtifact"
-            ]
-        },
-        "delete": {
-            "permissions": [
-                "servicecatalog:DisassociateServiceActionFromProvisioningArtifact"
-            ]
-        }
+    "ProvisioningArtifactId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "ServiceActionId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "Id": {
+      "type": "string"
     }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ProductId",
+    "ProvisioningArtifactId",
+    "ServiceActionId"
+  ],
+  "createOnlyProperties": [
+    "/properties/ProductId",
+    "/properties/ProvisioningArtifactId",
+    "/properties/ServiceActionId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "servicecatalog:AssociateServiceActionWithProvisioningArtifact"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "servicecatalog:ListServiceActionsForProvisioningArtifact"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "servicecatalog:DisassociateServiceActionFromProvisioningArtifact"
+      ]
+    }
+  }
 }

@@ -43,4 +43,3 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         }
     }
 }
-

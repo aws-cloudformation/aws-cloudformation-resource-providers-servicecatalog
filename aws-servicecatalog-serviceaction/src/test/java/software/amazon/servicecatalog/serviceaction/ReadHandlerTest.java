@@ -116,4 +116,3 @@ public class ReadHandlerTest {
         assertThrows(CfnNotFoundException.class, () -> handler.handleRequest(proxy, request, null, logger));
     }
 }
-

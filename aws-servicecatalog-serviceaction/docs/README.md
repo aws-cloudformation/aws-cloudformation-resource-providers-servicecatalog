@@ -68,4 +68,3 @@ Returns the <code>Definition</code> value.
 #### Description
 
 Returns the <code>Description</code> value.
-
