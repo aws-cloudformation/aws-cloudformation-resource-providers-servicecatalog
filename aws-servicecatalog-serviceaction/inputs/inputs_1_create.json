@@ -1,0 +1,23 @@
+{
+  "Name": "SimpleServiceAction",
+  "DefinitionType": "SSM_AUTOMATION",
+  "Description": "Simple ServiceAction Canary",
+  "Definition": [
+    {
+      "Key": "Parameters",
+      "Value": "[{\"Name\":\"InstanceId\",\"Type\":\"TARGET\"}]"
+    },
+    {
+      "Key": "Version",
+      "Value": "1"
+    },
+    {
+      "Key": "AssumeRole",
+      "Value": "LAUNCH_ROLE"
+    },
+    {
+      "Key": "Name",
+      "Value": "AWS-StartEC2Instance"
+    }
+  ]
+}

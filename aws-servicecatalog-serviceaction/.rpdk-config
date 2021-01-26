@@ -1,0 +1,17 @@
+{
+    "typeName": "AWS::ServiceCatalog::ServiceAction",
+    "language": "java",
+    "runtime": "java8",
+    "entrypoint": "software.amazon.servicecatalog.serviceaction.HandlerWrapper::handleRequest",
+    "testEntrypoint": "software.amazon.servicecatalog.serviceaction.HandlerWrapper::testEntrypoint",
+    "settings": {
+        "namespace": [
+            "software",
+            "amazon",
+            "servicecatalog",
+            "serviceaction"
+        ],
+        "protocolVersion": "2.0.0"
+    },
+    "executableEntrypoint": "software.amazon.servicecatalog.serviceaction.HandlerWrapperExecutable"
+}
