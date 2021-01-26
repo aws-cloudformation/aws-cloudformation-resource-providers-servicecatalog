@@ -1,0 +1,5 @@
+{
+  "ProductId": "{{ProductIdForServiceActionContractTest}}",
+  "ProvisioningArtifactId": "{{ProvisioningArtifactIdForServiceActionContractTest}}",
+  "ServiceActionId": "{{ServiceActionForContractTestId}}"
+}
