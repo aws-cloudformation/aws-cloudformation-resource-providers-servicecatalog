@@ -1,0 +1,23 @@
+{
+  "Id": "act-12345",
+  "Name": "SimpleServiceAction",
+  "Description": "Simple ServiceAction Canary",
+  "Definition": [
+    {
+      "Key": "Name",
+      "Value": "AWS-StartEC2Instance"
+    },
+    {
+      "Key": "Version",
+      "Value": "1"
+    },
+    {
+      "Key": "AssumeRole",
+      "Value": "LAUNCH_ROLE"
+    },
+    {
+      "Key": "Parameters",
+      "Value": "[{\"Name\":\"InstanceId\",\"Type\":\"TARGET\"}]"
+    }
+  ]
+}
