@@ -20,9 +20,6 @@
       "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\\Z",
       "minLength": 1,
       "maxLength": 100
-    },
-    "Id": {
-      "type": "string"
     }
   },
   "additionalProperties": false,
@@ -36,11 +33,10 @@
     "/properties/ProvisioningArtifactId",
     "/properties/ServiceActionId"
   ],
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
   "primaryIdentifier": [
-    "/properties/Id"
+    "/properties/ProductId",
+    "/properties/ProvisioningArtifactId",
+    "/properties/ServiceActionId"
   ],
   "handlers": {
     "create": {
