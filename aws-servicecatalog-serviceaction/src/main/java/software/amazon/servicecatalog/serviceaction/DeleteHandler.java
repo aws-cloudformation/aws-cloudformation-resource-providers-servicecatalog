@@ -35,7 +35,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
             return ProgressEvent.defaultSuccessHandler(null);
 
         } catch (ResourceInUseException e) {
-            throw new CfnServiceInternalErrorException(String.format(RESOURCE_IN_USE_ERROR, desiredModel.getName(), e.getMessage()), e);
+            throw new CfnServiceInternalErrorException(String.format(RESOURCE_IN_USE_ERROR, desiredModel.getId(), e.getMessage()), e);
 
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
