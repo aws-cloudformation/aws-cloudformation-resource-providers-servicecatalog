@@ -64,11 +64,7 @@
     "/properties/Id"
   ],
   "readOnlyProperties": [
-    "/properties/Id",
-    "/properties/Name",
-    "/properties/DefinitionType",
-    "/properties/Definition",
-    "/properties/Description"
+    "/properties/Id"
   ],
   "required": [
     "Name",

@@ -13,6 +13,10 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "AWS::ServiceCatalog::ServiceAction",
     "Properties" : {
         "<a href="#acceptlanguage" title="AcceptLanguage">AcceptLanguage</a>" : <i>String</i>,
+        "<a href="#name" title="Name">Name</a>" : <i>String</i>,
+        "<a href="#definitiontype" title="DefinitionType">DefinitionType</a>" : <i>String</i>,
+        "<a href="#definition" title="Definition">Definition</a>" : <i>[ <a href="definitionparameter.md">DefinitionParameter</a>, ... ]</i>,
+        "<a href="#description" title="Description">Description</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -23,6 +27,11 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: AWS::ServiceCatalog::ServiceAction
 Properties:
     <a href="#acceptlanguage" title="AcceptLanguage">AcceptLanguage</a>: <i>String</i>
+    <a href="#name" title="Name">Name</a>: <i>String</i>
+    <a href="#definitiontype" title="DefinitionType">DefinitionType</a>: <i>String</i>
+    <a href="#definition" title="Definition">Definition</a>: <i>
+      - <a href="definitionparameter.md">DefinitionParameter</a></i>
+    <a href="#description" title="Description">Description</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -34,6 +43,46 @@ _Required_: No
 _Type_: String
 
 _Allowed Values_: <code>en</code> | <code>jp</code> | <code>zh</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Name
+
+_Required_: Yes
+
+_Type_: String
+
+_Minimum_: <code>1</code>
+
+_Maximum_: <code>256</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### DefinitionType
+
+_Required_: Yes
+
+_Type_: String
+
+_Allowed Values_: <code>SSM_AUTOMATION</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Definition
+
+_Required_: Yes
+
+_Type_: List of <a href="definitionparameter.md">DefinitionParameter</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Description
+
+_Required_: No
+
+_Type_: String
+
+_Maximum_: <code>1024</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -52,19 +101,3 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Id
 
 Returns the <code>Id</code> value.
-
-#### Name
-
-Returns the <code>Name</code> value.
-
-#### DefinitionType
-
-Returns the <code>DefinitionType</code> value.
-
-#### Definition
-
-Returns the <code>Definition</code> value.
-
-#### Description
-
-Returns the <code>Description</code> value.

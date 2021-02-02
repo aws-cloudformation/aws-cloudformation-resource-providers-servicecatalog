@@ -46,25 +46,17 @@ public class ActionAssociationController {
         return proxy.injectCredentialsAndInvokeV2(request, scClient::listServiceActionsForProvisioningArtifact);
     }
 
-    public ResourceModel describeServiceActionAssociation(final String productId, final String provisioningArtifactId, final String serviceActionId) {
+    public boolean isServiceActionAssociatedToPA(final String productId, final String provisioningArtifactId, final String serviceActionId) {
         String pageToken = null;
         do {
             final ListServiceActionsForProvisioningArtifactResponse response = listServiceActions(productId, provisioningArtifactId, pageToken);
             final List<ServiceActionSummary> serviceActions = response.serviceActionSummaries();
             pageToken = response.nextPageToken();
-            boolean isMatch = serviceActions.stream().anyMatch(serviceActionSummary -> serviceActionId.equals(serviceActionSummary.id()));
-            if (isMatch) {
-                return ResourceModel
-                        .builder()
-                        .serviceActionId(serviceActionId)
-                        .provisioningArtifactId(provisioningArtifactId)
-                        .productId(productId)
-                        .build();
+            if (serviceActions.stream().anyMatch(serviceActionSummary -> serviceActionId.equals(serviceActionSummary.id()))) {
+                return true;
             }
-
         } while(!StringUtils.isNullOrEmpty(pageToken));
-        logger.log(String.format(RESOURCE_NOT_FOUND_EXCEPTION, serviceActionId, productId, provisioningArtifactId));
-        throw ResourceNotFoundException.builder().message(String.format(RESOURCE_NOT_FOUND_EXCEPTION, serviceActionId, productId, provisioningArtifactId)).build();
+        return false;
     }
 
     public void associateServiceAction(final String productId, final String provisioningArtifactId, final String serviceActionId) {

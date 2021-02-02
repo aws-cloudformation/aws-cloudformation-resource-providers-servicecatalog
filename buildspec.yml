@@ -5,6 +5,7 @@ phases:
         java: openjdk8
         python: 3.7
     commands:
+      - pip install --upgrade 'six==1.15.0'
       -  pip install pre-commit cloudformation-cli-java-plugin
   build:
     commands:
@@ -19,6 +20,7 @@ phases:
             cd "$directory"
             mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B clean verify --no-transfer-progress
             if [ "$?" -ne 0 ] ; then
+                cat rpdk.log
                 echo "Build failed!"
                 exit 1
             else
