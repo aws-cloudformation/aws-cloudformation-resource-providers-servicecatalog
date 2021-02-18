@@ -16,6 +16,8 @@ import static software.amazon.servicecatalog.serviceactionassociation.HandlerCon
  * Stabilization Class for Create and Delete Handlers.
  */
 public class Stabilization {
+    private static final String CREATE_RETRIES = "Create service action retries remaining: %s";
+    private static final String DELETE_RETRIES = "Delete service action retries remaining: %s";
 
     public static ProgressEvent<ResourceModel, CallbackContext> handleCreateStabilizeRequest(final ActionAssociationController actionController, final ResourceHandlerRequest<ResourceModel> request,
                                                                                              final CallbackContext callbackContext,
@@ -27,6 +29,7 @@ public class Stabilization {
         }
         try {
             final boolean isMatch = actionController.isServiceActionAssociatedToPA(callbackContext.getProductId(), callbackContext.getProvisioningArtifactId(), callbackContext.getServiceActionId());
+            logger.log(String.format(CREATE_RETRIES, callbackContext.getStabilizationRetriesRemaining()));
             if(isMatch){
                 return ProgressEvent.defaultSuccessHandler(model);
             } else {
@@ -52,6 +55,7 @@ public class Stabilization {
         }
         try {
             final boolean isMatch = actionController.isServiceActionAssociatedToPA(callbackContext.getProductId(), callbackContext.getProvisioningArtifactId(), callbackContext.getServiceActionId());
+            logger.log(String.format(DELETE_RETRIES, callbackContext.getStabilizationRetriesRemaining()));
             if(isMatch){
                 return ProgressEvent.defaultInProgressHandler(
                         callbackContext.toBuilder()

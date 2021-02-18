@@ -31,6 +31,9 @@ public class ActionAssociationController {
     private static final String DISASSOCIATE_EXCEPTION = "In updateHandler, DisassociateServiceAction received Exception %s";
     private static final String DISASSOCIATE_SERVICE_ACTION_LOG = "Disassociate serviceAction: %s, from provisioningArtifact: %s and product: %s";
     private static final String RESOURCE_NOT_FOUND_EXCEPTION = "ServiceAction %s with product id %s and provisioning artifact id %s not found";
+    private static final String LIST_SERVICE_ACTION_LOG = "List service action associated to provisioningArtifact: %s of product: %s";
+    private static final String SERVICE_ACTION_ASSOCIATED_TO_PA = "Service action: %s associated to provisioningArtifact: %s of product: %s";
+    private static final String SERVICE_ACTION_NOT_ASSOCIATED_TO_PA = "Service action: %s not associated to provisioningArtifact: %s of product: %s";
 
     private final Logger logger;
     private final ServiceCatalogClient scClient;
@@ -43,6 +46,7 @@ public class ActionAssociationController {
                 .pageToken(pageToken)
                 .build();
 
+        logger.log(String.format(LIST_SERVICE_ACTION_LOG, provisioningArtifactId, productId));
         return proxy.injectCredentialsAndInvokeV2(request, scClient::listServiceActionsForProvisioningArtifact);
     }
 
@@ -53,9 +57,11 @@ public class ActionAssociationController {
             final List<ServiceActionSummary> serviceActions = response.serviceActionSummaries();
             pageToken = response.nextPageToken();
             if (serviceActions.stream().anyMatch(serviceActionSummary -> serviceActionId.equals(serviceActionSummary.id()))) {
+                logger.log(String.format(SERVICE_ACTION_ASSOCIATED_TO_PA, serviceActionId, provisioningArtifactId, productId));
                 return true;
             }
         } while(!StringUtils.isNullOrEmpty(pageToken));
+        logger.log(String.format(SERVICE_ACTION_NOT_ASSOCIATED_TO_PA, serviceActionId, provisioningArtifactId, productId));
         return false;
     }
 
