@@ -75,7 +75,8 @@
     "create": {
       "permissions": [
         "servicecatalog:CreateServiceAction",
-        "ssm:DescribeDocument"
+        "ssm:DescribeDocument",
+        "iam:GetRole"
       ]
     },
     "read": {
@@ -85,7 +86,8 @@
     },
     "update": {
       "permissions": [
-        "servicecatalog:UpdateServiceAction"
+        "servicecatalog:UpdateServiceAction",
+        "iam:GetRole"
       ]
     },
     "delete": {

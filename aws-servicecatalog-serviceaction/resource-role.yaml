@@ -23,6 +23,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:GetRole"
                 - "servicecatalog:CreateServiceAction"
                 - "servicecatalog:DeleteServiceAction"
                 - "servicecatalog:DescribeServiceAction"
