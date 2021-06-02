@@ -94,6 +94,11 @@
       "permissions": [
         "servicecatalog:DeleteServiceAction"
       ]
+    },
+    "list": {
+      "permissions": [
+        "servicecatalog:ListServiceActions"
+      ]
     }
   }
 }

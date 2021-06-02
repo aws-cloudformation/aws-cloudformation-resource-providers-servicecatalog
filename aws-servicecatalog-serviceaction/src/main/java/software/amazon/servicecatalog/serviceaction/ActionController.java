@@ -1,9 +1,11 @@
 package software.amazon.servicecatalog.serviceaction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.amazonaws.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,8 @@ import software.amazon.awssdk.services.servicecatalog.model.CreateServiceActionR
 import software.amazon.awssdk.services.servicecatalog.model.DeleteServiceActionRequest;
 import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionRequest;
 import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionResponse;
+import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsRequest;
+import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsResponse;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionDetail;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionSummary;
 import software.amazon.awssdk.services.servicecatalog.model.UpdateServiceActionRequest;
@@ -28,6 +32,7 @@ public class ActionController {
     private static final String DELETE_SERVICE_ACTION_LOG = "Delete serviceAction with Id: %s";
     private static final String UPDATE_SERVICE_ACTION_LOG = "Update serviceAction with Id: %s";
     private static final String DESCRIBE_SERVICE_ACTION_LOG = "Describe serviceAcion with id: %s";
+    private static final String LIST_SERVICE_ACTIONS_LOG = "Listing all serviceAcions";
 
     private final Logger logger;
     private final ServiceCatalogClient scClient;
@@ -79,6 +84,26 @@ public class ActionController {
         return proxy.injectCredentialsAndInvokeV2(request, scClient::describeServiceAction);
     }
 
+    public List<String> listServiceAction() {
+        String pageToken = null;
+        List<String> serviceActionIds = new ArrayList<>();
+        do {
+            final ListServiceActionsRequest request = ListServiceActionsRequest
+                    .builder()
+                    .pageToken(pageToken)
+                    .build();
+            logger.log(LIST_SERVICE_ACTIONS_LOG);
+            ListServiceActionsResponse response = proxy.injectCredentialsAndInvokeV2(request, scClient::listServiceActions);
+            List<ServiceActionSummary> serviceActionSummaries = response.serviceActionSummaries();
+            pageToken = response.nextPageToken();
+            for (ServiceActionSummary serviceActionSummary: serviceActionSummaries) {
+                serviceActionIds.add(serviceActionSummary.id());
+            }
+        } while(!StringUtils.isNullOrEmpty(pageToken));
+
+        return serviceActionIds;
+    }
+
     private Map<String, String> buildServiceActionDefinition(final List<DefinitionParameter> definitions) {
         return definitions
                 .stream()
@@ -107,5 +132,16 @@ public class ActionController {
                 .description(serviceActionSummary.description())
                 .id(serviceActionSummary.id())
                 .build();
+    }
+
+    static public List<ResourceModel> buildListResourceModel(List<String> serviceActionIds) {
+        final List<ResourceModel> models = new ArrayList<>();
+        for(String actionId : serviceActionIds){
+            ResourceModel resourceModel = ResourceModel.builder()
+                    .id(actionId)
+                    .build();
+            models.add(resourceModel);
+        }
+        return models;
     }
 }
