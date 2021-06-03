@@ -20,6 +20,7 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.servicecatalog.serviceactionassociation.model.UpdateAssociationStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder(toBuilder = true)
@@ -34,6 +35,7 @@ public class ActionAssociationController {
     private static final String LIST_SERVICE_ACTION_LOG = "List service action associated to provisioningArtifact: %s of product: %s";
     private static final String SERVICE_ACTION_ASSOCIATED_TO_PA = "Service action: %s associated to provisioningArtifact: %s of product: %s";
     private static final String SERVICE_ACTION_NOT_ASSOCIATED_TO_PA = "Service action: %s not associated to provisioningArtifact: %s of product: %s";
+    private static final String LIST_ALL_SERVICE_ACTION_LOG = "List all service actions associated to provisioningArtifact: %s of product: %s";
 
     private final Logger logger;
     private final ServiceCatalogClient scClient;
@@ -85,6 +87,40 @@ public class ActionAssociationController {
                 .build();
         logger.log(String.format(DISASSOCIATE_SERVICE_ACTION_LOG, serviceActionId, provisioningArtifactId, productId));
         proxy.injectCredentialsAndInvokeV2(request, scClient::disassociateServiceActionFromProvisioningArtifact);
+    }
+
+    public List<String> listServiceActionsForProvisioningArtifact(final String productId, final String provisioningArtifactId) {
+        String pageToken = null;
+        List<String> serviceActionIds = new ArrayList<>();
+        do {
+            final ListServiceActionsForProvisioningArtifactRequest request = ListServiceActionsForProvisioningArtifactRequest.builder()
+                    .productId(productId)
+                    .provisioningArtifactId(provisioningArtifactId)
+                    .pageToken(pageToken)
+                    .build();
+            logger.log(String.format(LIST_ALL_SERVICE_ACTION_LOG, provisioningArtifactId, productId));
+            ListServiceActionsForProvisioningArtifactResponse response = proxy.injectCredentialsAndInvokeV2(request, scClient::listServiceActionsForProvisioningArtifact);
+            List<ServiceActionSummary> serviceActionSummaries = response.serviceActionSummaries();
+            pageToken = response.nextPageToken();
+            for (ServiceActionSummary serviceActionSummary: serviceActionSummaries) {
+                serviceActionIds.add(serviceActionSummary.id());
+            }
+        } while(!StringUtils.isNullOrEmpty(pageToken));
+
+        return serviceActionIds;
+    }
+
+    public List<ResourceModel> buildListResourceModel(List<String> serviceActionIds, final String productId, final String provisioningArtifactId) {
+        final List<ResourceModel> models = new ArrayList<>();
+        for(String actionId : serviceActionIds){
+            ResourceModel resourceModel = ResourceModel.builder()
+                    .productId(productId)
+                    .provisioningArtifactId(provisioningArtifactId)
+                    .serviceActionId(actionId)
+                    .build();
+            models.add(resourceModel);
+        }
+        return models;
     }
 
     public UpdateAssociationStatus updateServiceActionAssociation(final ResourceModel previousModel, final ResourceModel desiredModel) {

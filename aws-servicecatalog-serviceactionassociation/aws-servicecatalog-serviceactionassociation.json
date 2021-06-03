@@ -53,6 +53,11 @@
       "permissions": [
         "servicecatalog:DisassociateServiceActionFromProvisioningArtifact"
       ]
+    },
+    "list": {
+      "permissions": [
+        "servicecatalog:ListServiceActionsForProvisioningArtifact"
+      ]
     }
   }
 }
