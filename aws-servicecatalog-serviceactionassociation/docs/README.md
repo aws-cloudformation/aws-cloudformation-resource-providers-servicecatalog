@@ -72,4 +72,3 @@ _Maximum_: <code>100</code>
 _Pattern_: <code>^[a-zA-Z0-9][a-zA-Z0-9_-]{1,99}\Z</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
-
