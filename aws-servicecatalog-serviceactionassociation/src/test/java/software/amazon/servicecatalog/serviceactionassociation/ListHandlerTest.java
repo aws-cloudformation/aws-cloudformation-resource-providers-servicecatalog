@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsFo
 import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsForProvisioningArtifactResponse;
 import software.amazon.awssdk.services.servicecatalog.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionSummary;
+import software.amazon.awssdk.services.servicecatalog.paginators.ListServiceActionsForProvisioningArtifactIterable;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -20,9 +21,10 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -42,6 +44,9 @@ public class ListHandlerTest {
 
     @Mock
     private Logger logger;
+
+    @Mock
+    private ListServiceActionsForProvisioningArtifactIterable iterable;
 
     @BeforeEach
     public void setup() {
@@ -73,10 +78,13 @@ public class ListHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        doReturn(response).when(proxy).injectCredentialsAndInvokeV2(
-                eq(listRequest),
-                ArgumentMatchers.any()
-        );
+        Stream<ListServiceActionsForProvisioningArtifactResponse> stream = Stream.<ListServiceActionsForProvisioningArtifactResponse>builder()
+                .add(response)
+                .build();
+        doReturn(iterable).when(proxy).injectCredentialsAndInvokeIterableV2(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.any());
+        doReturn(stream).when(iterable).stream();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
@@ -103,7 +111,7 @@ public class ListHandlerTest {
                 .build();
 
         doThrow(InvalidParametersException.builder().message(INVALID_PARAMETERS_EXCEPTION).build())
-                .when(proxy).injectCredentialsAndInvokeV2(
+                .when(proxy).injectCredentialsAndInvokeIterableV2(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.any());
 
@@ -120,7 +128,7 @@ public class ListHandlerTest {
                 .build();
 
         doThrow(ResourceNotFoundException.builder().message(INVALID_PARAMETERS_EXCEPTION).build())
-                .when(proxy).injectCredentialsAndInvokeV2(
+                .when(proxy).injectCredentialsAndInvokeIterableV2(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.any());
 

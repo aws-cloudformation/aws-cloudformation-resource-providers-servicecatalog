@@ -10,6 +10,7 @@ import software.amazon.servicecatalog.SCClientBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListHandler extends BaseHandler<CallbackContext> {
 
@@ -20,7 +21,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger) {
 
-        ActionAssociationController controller = ActionAssociationController
+        final ActionAssociationController controller = ActionAssociationController
                 .builder()
                 .logger(logger)
                 .proxy(proxy)
@@ -33,8 +34,8 @@ public class ListHandler extends BaseHandler<CallbackContext> {
         List<ResourceModel> models = new ArrayList<>();
 
         try {
-            final List<String> serviceActionIds = controller.listServiceActionsForProvisioningArtifact(productId, provisioningArtifactId);
-            models = controller.buildListResourceModel(serviceActionIds, productId, provisioningArtifactId);
+            final List<String> serviceActionIds = controller.listAllServiceActionIdsForProvisioningArtifact(productId, provisioningArtifactId);
+            models = buildListResourceModel(serviceActionIds, productId, provisioningArtifactId);
         } catch (SdkException e) {
             ExceptionTranslator.translateToCfnException(e);
         }
@@ -42,5 +43,13 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                 .resourceModels(models)
                 .status(OperationStatus.SUCCESS)
                 .build();
+    }
+
+    private List<ResourceModel> buildListResourceModel(List<String> serviceActionIds, final String productId, final String provisioningArtifactId) {
+        return serviceActionIds.stream().map(actionId -> ResourceModel.builder()
+                .productId(productId)
+                .provisioningArtifactId(provisioningArtifactId)
+                .serviceActionId(actionId)
+                .build()).collect(Collectors.toList());
     }
 }

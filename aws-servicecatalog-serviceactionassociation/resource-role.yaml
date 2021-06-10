@@ -26,6 +26,7 @@ Resources:
                 - "servicecatalog:AssociateServiceActionWithProvisioningArtifact"
                 - "servicecatalog:DisassociateServiceActionFromProvisioningArtifact"
                 - "servicecatalog:ListServiceActionsForProvisioningArtifact"
+                - "servicecatalog:ListServiceActionsForProvisioningArtifactPaginator"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

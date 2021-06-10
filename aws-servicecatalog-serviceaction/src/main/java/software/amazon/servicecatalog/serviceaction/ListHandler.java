@@ -1,7 +1,6 @@
 package software.amazon.servicecatalog.serviceaction;
 
-import software.amazon.awssdk.services.servicecatalog.model.InvalidParametersException;
-import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -9,10 +8,11 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.servicecatalog.SCClientBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListHandler extends BaseHandler<CallbackContext> {
-    private static final String LIST_ERROR_MSG = "Unable to list service action because: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -21,23 +21,28 @@ public class ListHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger){
 
-        ActionController actionController = ActionController
+        final ActionController actionController = ActionController
                 .builder()
                 .logger(logger)
                 .proxy(proxy)
                 .scClient(SCClientBuilder.getClient())
                 .build();
+        List<ResourceModel> models = new ArrayList<>();
         try {
-            final List<String> serviceActionIds = actionController.listServiceAction();
-            final List<ResourceModel> models = ActionController
-                    .buildListResourceModel(serviceActionIds);
-            return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                    .resourceModels(models)
-                    .status(OperationStatus.SUCCESS)
-                    .build();
-
-        } catch (InvalidParametersException e) {
-            throw new CfnInvalidRequestException(String.format(LIST_ERROR_MSG, e.getMessage()), e);
+            final List<String> serviceActionIds = actionController.listAllServiceActionIds();
+            models = buildListResourceModel(serviceActionIds);
+        } catch (SdkException e) {
+            ExceptionTranslator.translateToCfnException(e);
         }
+        return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                .resourceModels(models)
+                .status(OperationStatus.SUCCESS)
+                .build();
+    }
+
+    private List<ResourceModel> buildListResourceModel(List<String> serviceActionIds) {
+        return serviceActionIds.stream().map(actionId -> ResourceModel.builder()
+                .id(actionId)
+                .build()).collect(Collectors.toList());
     }
 }

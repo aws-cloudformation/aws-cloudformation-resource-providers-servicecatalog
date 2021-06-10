@@ -1,9 +1,6 @@
 package software.amazon.servicecatalog.serviceaction;
 
-import software.amazon.awssdk.services.servicecatalog.model.ResourceInUseException;
-import software.amazon.awssdk.services.servicecatalog.model.ResourceNotFoundException;
-import software.amazon.cloudformation.exceptions.CfnNotFoundException;
-import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -11,8 +8,6 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.servicecatalog.SCClientBuilder;
 
 public class DeleteHandler extends BaseHandler<CallbackContext> {
-
-    private static final String RESOURCE_IN_USE_ERROR = "Cannot delete resource %s because: %s";
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -32,14 +27,9 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
 
         try {
             actionController.deleteServiceAction(desiredModel.getId());
-            return ProgressEvent.defaultSuccessHandler(null);
-
-        } catch (ResourceInUseException e) {
-            throw new CfnServiceInternalErrorException(String.format(RESOURCE_IN_USE_ERROR, desiredModel.getId(), e.getMessage()), e);
-
-        } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
-
+        } catch (SdkException e) {
+            ExceptionTranslator.translateToCfnException(e);
         }
+        return ProgressEvent.defaultSuccessHandler(null);
     }
 }

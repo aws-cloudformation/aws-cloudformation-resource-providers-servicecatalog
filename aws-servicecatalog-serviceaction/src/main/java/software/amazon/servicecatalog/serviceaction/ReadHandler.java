@@ -1,8 +1,7 @@
 package software.amazon.servicecatalog.serviceaction;
 
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionResponse;
-import software.amazon.awssdk.services.servicecatalog.model.ResourceNotFoundException;
-import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -24,16 +23,13 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                 .logger(logger)
                 .scClient(SCClientBuilder.getClient())
                 .build();
-        final ResourceModel desiredModel = request.getDesiredResourceState();
+        ResourceModel desiredModel = request.getDesiredResourceState();
         try {
             final DescribeServiceActionResponse response = actionController.describeServiceAction(desiredModel.getId());
-            final ResourceModel model = ActionController
-                    .buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
-            return ProgressEvent.defaultSuccessHandler(model);
-
-        } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
-
+            desiredModel = ActionController.buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
+        } catch (SdkException e) {
+            ExceptionTranslator.translateToCfnException(e);
         }
+        return ProgressEvent.defaultSuccessHandler(desiredModel);
     }
 }

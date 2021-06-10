@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.servicecatalog.model.InvalidParametersException;
 import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsResponse;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionSummary;
+import software.amazon.awssdk.services.servicecatalog.paginators.ListServiceActionsIterable;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -18,11 +19,11 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ListHandlerTest {
@@ -37,6 +38,9 @@ public class ListHandlerTest {
 
     @Mock
     private Logger logger;
+
+    @Mock
+    private ListServiceActionsIterable iterable;
 
     @BeforeEach
     public void setup() {
@@ -62,9 +66,12 @@ public class ListHandlerTest {
         final ListServiceActionsResponse result = ListServiceActionsResponse.builder()
                 .serviceActionSummaries(buildServiceActionSummaries())
                 .build();
-        doReturn(result).when(proxy).injectCredentialsAndInvokeV2(
+
+        Stream<ListServiceActionsResponse> stream = Stream.<ListServiceActionsResponse>builder().add(result).build();
+        doReturn(iterable).when(proxy).injectCredentialsAndInvokeIterableV2(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.any());
+        doReturn(stream).when(iterable).stream();
 
         final ResourceHandlerRequest<ResourceModel> resourceHandlerRequest = ResourceHandlerRequest
                 .<ResourceModel>builder()
@@ -93,7 +100,7 @@ public class ListHandlerTest {
                 .build();
 
         doThrow(InvalidParametersException.builder().message(INVALID_PARAMETERS_EXCEPTION).build())
-                .when(proxy).injectCredentialsAndInvokeV2(
+                .when(proxy).injectCredentialsAndInvokeIterableV2(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.any());
 
