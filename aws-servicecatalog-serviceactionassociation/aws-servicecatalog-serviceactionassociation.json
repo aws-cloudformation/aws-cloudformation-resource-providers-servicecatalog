@@ -56,7 +56,7 @@
     },
     "list": {
       "permissions": [
-        "servicecatalog:ListServiceActionsForProvisioningArtifactPaginator"
+        "servicecatalog:ListServiceActionsForProvisioningArtifact"
       ]
     }
   }

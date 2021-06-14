@@ -14,40 +14,37 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
 
-        ActionAssociationController controller = ActionAssociationController
+        final ActionAssociationController controller = ActionAssociationController
                 .builder()
                 .logger(logger)
                 .proxy(proxy)
                 .scClient(SCClientBuilder.getClient())
                 .build();
 
-        ResourceModel resourceModel = null;
         try {
             final ResourceModel desiredModel = request.getDesiredResourceState();
             final String serviceActionId = desiredModel.getServiceActionId();
             final String productId = desiredModel.getProductId();
             final String provisioningArtifactId = desiredModel.getProvisioningArtifactId();
-            boolean isMatch = controller.isServiceActionAssociatedToPA(productId, provisioningArtifactId, serviceActionId);
+            final boolean isMatch = controller.isServiceActionAssociatedToPA(productId, provisioningArtifactId, serviceActionId);
             if(isMatch){
-                resourceModel = ResourceModel
+                ResourceModel resourceModel = ResourceModel
                         .builder()
                         .serviceActionId(serviceActionId)
                         .provisioningArtifactId(provisioningArtifactId)
                         .productId(productId)
                         .build();
+                return ProgressEvent.defaultSuccessHandler(resourceModel);
             } else {
-                logger.log(String.format(RESOURCE_NOT_FOUND_EXCEPTION, serviceActionId, productId, provisioningArtifactId));
                 throw ResourceNotFoundException.builder().message(String.format(RESOURCE_NOT_FOUND_EXCEPTION, serviceActionId, productId, provisioningArtifactId)).build();
             }
-
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultSuccessHandler(resourceModel);
     }
 }

@@ -12,20 +12,20 @@ import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 
 public class ExceptionTranslator {
-    public static void translateToCfnException(
+    public static RuntimeException translateToCfnException(
             final SdkException e) {
         if (e instanceof ResourceNotFoundException) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
+            return new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
         }
         if (e instanceof DuplicateResourceException) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, e.getMessage(), e);
+            return new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, e.getMessage(), e);
         }
         if (e instanceof LimitExceededException) {
-            throw new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage(), e);
+            return new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage(), e);
         }
         if (e instanceof InvalidParametersException) {
-            throw new CfnInvalidRequestException(ResourceModel.TYPE_NAME, e);
+            return new CfnInvalidRequestException(ResourceModel.TYPE_NAME, e);
         }
-        throw new CfnInternalFailureException(e);
+        return new CfnInternalFailureException(e);
     }
 }

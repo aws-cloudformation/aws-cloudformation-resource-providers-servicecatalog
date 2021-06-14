@@ -12,24 +12,25 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
-        ActionController actionController = ActionController
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
+        final ActionController actionController = ActionController
                 .builder()
                 .logger(logger)
                 .proxy(proxy)
                 .scClient(SCClientBuilder.getClient())
                 .build();
-        ResourceModel desiredModel = request.getDesiredResourceState();
+        final ResourceModel desiredModel = request.getDesiredResourceState();
         try {
             final UpdateServiceActionResponse response = actionController.updateServiceAction(desiredModel);
-            desiredModel = ActionController
+            final ResourceModel model = ActionController
                     .buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
+            return ProgressEvent.defaultSuccessHandler(model);
+
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultSuccessHandler(desiredModel);
     }
 }

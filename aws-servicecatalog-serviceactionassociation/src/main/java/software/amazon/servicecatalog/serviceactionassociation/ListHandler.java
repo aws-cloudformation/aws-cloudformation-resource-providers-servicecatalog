@@ -8,7 +8,6 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.servicecatalog.SCClientBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,10 +15,10 @@ public class ListHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
 
         final ActionAssociationController controller = ActionAssociationController
                 .builder()
@@ -31,18 +30,17 @@ public class ListHandler extends BaseHandler<CallbackContext> {
         final ResourceModel desiredModel = request.getDesiredResourceState();
         final String productId = desiredModel.getProductId();
         final String provisioningArtifactId = desiredModel.getProvisioningArtifactId();
-        List<ResourceModel> models = new ArrayList<>();
 
         try {
             final List<String> serviceActionIds = controller.listAllServiceActionIdsForProvisioningArtifact(productId, provisioningArtifactId);
-            models = buildListResourceModel(serviceActionIds, productId, provisioningArtifactId);
+            final List<ResourceModel> models = buildListResourceModel(serviceActionIds, productId, provisioningArtifactId);
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .resourceModels(models)
+                    .status(OperationStatus.SUCCESS)
+                    .build();
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                .resourceModels(models)
-                .status(OperationStatus.SUCCESS)
-                .build();
     }
 
     private List<ResourceModel> buildListResourceModel(List<String> serviceActionIds, final String productId, final String provisioningArtifactId) {

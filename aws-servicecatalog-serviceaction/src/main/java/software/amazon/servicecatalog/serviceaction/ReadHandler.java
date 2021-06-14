@@ -12,24 +12,26 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
 
-        ActionController actionController = ActionController
+        final ActionController actionController = ActionController
                 .builder()
                 .proxy(proxy)
                 .logger(logger)
                 .scClient(SCClientBuilder.getClient())
                 .build();
-        ResourceModel desiredModel = request.getDesiredResourceState();
+        final ResourceModel desiredModel = request.getDesiredResourceState();
         try {
             final DescribeServiceActionResponse response = actionController.describeServiceAction(desiredModel.getId());
-            desiredModel = ActionController.buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
+            final ResourceModel model = ActionController
+                    .buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
+            return ProgressEvent.defaultSuccessHandler(model);
+
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultSuccessHandler(desiredModel);
     }
 }

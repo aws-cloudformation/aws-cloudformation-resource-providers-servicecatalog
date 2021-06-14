@@ -20,7 +20,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger) {
 
-        ActionAssociationController controller = ActionAssociationController
+        final ActionAssociationController controller = ActionAssociationController
                 .builder()
                 .logger(logger)
                 .proxy(proxy)
@@ -40,16 +40,16 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         final ResourceModel desiredModel = request.getDesiredResourceState();
         try {
             controller.associateServiceAction(desiredModel.getProductId(), desiredModel.getProvisioningArtifactId(), desiredModel.getServiceActionId());
+            return ProgressEvent.defaultInProgressHandler(CallbackContext.builder()
+                            .productId(desiredModel.getProductId())
+                            .provisioningArtifactId(desiredModel.getProvisioningArtifactId())
+                            .serviceActionId(desiredModel.getServiceActionId())
+                            .stabilizationRetriesRemaining(NUMBER_OF_STATE_POLL_RETRIES)
+                            .build(),
+                    POLL_RETRY_DELAY_SECONDS,
+                    desiredModel);
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultInProgressHandler(CallbackContext.builder()
-                        .productId(desiredModel.getProductId())
-                        .provisioningArtifactId(desiredModel.getProvisioningArtifactId())
-                        .serviceActionId(desiredModel.getServiceActionId())
-                        .stabilizationRetriesRemaining(NUMBER_OF_STATE_POLL_RETRIES)
-                        .build(),
-                POLL_RETRY_DELAY_SECONDS,
-                desiredModel);
     }
 }

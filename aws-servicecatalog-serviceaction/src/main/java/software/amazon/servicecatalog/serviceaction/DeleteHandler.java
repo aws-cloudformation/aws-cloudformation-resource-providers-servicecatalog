@@ -11,10 +11,10 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
 
         final ActionController actionController = ActionController
                 .builder()
@@ -27,9 +27,9 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
 
         try {
             actionController.deleteServiceAction(desiredModel.getId());
+            return ProgressEvent.defaultSuccessHandler(null);
         } catch (SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultSuccessHandler(null);
     }
 }

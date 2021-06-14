@@ -97,7 +97,7 @@
     },
     "list": {
       "permissions": [
-        "servicecatalog:ListServiceActionsPaginator"
+        "servicecatalog:ListServiceActions"
       ]
     }
   }
