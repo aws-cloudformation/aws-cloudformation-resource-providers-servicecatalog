@@ -1,37 +1,46 @@
 package software.amazon.servicecatalog.serviceaction;
 
 import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.servicecatalog.SCClientBuilder;
 
-public class ReadHandler extends BaseHandler<CallbackContext> {
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ListHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final Logger logger) {
+        final Logger logger){
 
         final ActionController actionController = ActionController
                 .builder()
-                .proxy(proxy)
                 .logger(logger)
+                .proxy(proxy)
                 .scClient(SCClientBuilder.getClient())
                 .build();
-        final ResourceModel desiredModel = request.getDesiredResourceState();
         try {
-            final DescribeServiceActionResponse response = actionController.describeServiceAction(desiredModel.getId());
-            final ResourceModel model = ActionController
-                    .buildResourceModelFromServiceActionDetail(response.serviceActionDetail());
-            return ProgressEvent.defaultSuccessHandler(model);
-
+            final List<String> serviceActionIds = actionController.listAllServiceActionIds();
+            final List<ResourceModel> models = buildListResourceModel(serviceActionIds);
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .resourceModels(models)
+                    .status(OperationStatus.SUCCESS)
+                    .build();
         } catch (SdkException e) {
             throw ExceptionTranslator.translateToCfnException(e);
         }
+    }
+
+    private List<ResourceModel> buildListResourceModel(List<String> serviceActionIds) {
+        return serviceActionIds.stream().map(actionId -> ResourceModel.builder()
+                .id(actionId)
+                .build()).collect(Collectors.toList());
     }
 }

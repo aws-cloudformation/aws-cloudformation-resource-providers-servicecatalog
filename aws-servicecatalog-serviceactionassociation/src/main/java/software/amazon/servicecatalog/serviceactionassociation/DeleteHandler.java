@@ -15,12 +15,12 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final Logger logger) {
 
-        ActionAssociationController controller = ActionAssociationController
+        final ActionAssociationController controller = ActionAssociationController
                 .builder()
                 .scClient(SCClientBuilder.getClient())
                 .proxy(proxy)
@@ -40,16 +40,16 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
         final ResourceModel desiredModel = request.getDesiredResourceState();
         try {
             controller.disassociateServiceAction(desiredModel.getProductId(), desiredModel.getProvisioningArtifactId(), desiredModel.getServiceActionId());
+            return ProgressEvent.defaultInProgressHandler(CallbackContext.builder()
+                            .productId(desiredModel.getProductId())
+                            .provisioningArtifactId(desiredModel.getProvisioningArtifactId())
+                            .serviceActionId(desiredModel.getServiceActionId())
+                            .stabilizationRetriesRemaining(NUMBER_OF_STATE_POLL_RETRIES)
+                            .build(),
+                    POLL_RETRY_DELAY_SECONDS,
+                    desiredModel);
         } catch(SdkException e) {
-            ExceptionTranslator.translateToCfnException(e);
+            throw ExceptionTranslator.translateToCfnException(e);
         }
-        return ProgressEvent.defaultInProgressHandler(CallbackContext.builder()
-                        .productId(desiredModel.getProductId())
-                        .provisioningArtifactId(desiredModel.getProvisioningArtifactId())
-                        .serviceActionId(desiredModel.getServiceActionId())
-                        .stabilizationRetriesRemaining(NUMBER_OF_STATE_POLL_RETRIES)
-                        .build(),
-                POLL_RETRY_DELAY_SECONDS,
-                desiredModel);
     }
 }

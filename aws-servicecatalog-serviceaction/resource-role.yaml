@@ -27,6 +27,7 @@ Resources:
                 - "servicecatalog:CreateServiceAction"
                 - "servicecatalog:DeleteServiceAction"
                 - "servicecatalog:DescribeServiceAction"
+                - "servicecatalog:ListServiceActions"
                 - "servicecatalog:UpdateServiceAction"
                 - "ssm:DescribeDocument"
                 Resource: "*"

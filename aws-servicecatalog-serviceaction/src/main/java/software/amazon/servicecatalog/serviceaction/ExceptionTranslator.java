@@ -1,14 +1,16 @@
-package software.amazon.servicecatalog.serviceactionassociation;
+package software.amazon.servicecatalog.serviceaction;
 
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.servicecatalog.model.DuplicateResourceException;
 import software.amazon.awssdk.services.servicecatalog.model.InvalidParametersException;
 import software.amazon.awssdk.services.servicecatalog.model.LimitExceededException;
+import software.amazon.awssdk.services.servicecatalog.model.ResourceInUseException;
 import software.amazon.awssdk.services.servicecatalog.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 
 public class ExceptionTranslator {
@@ -16,6 +18,9 @@ public class ExceptionTranslator {
             final SdkException e) {
         if (e instanceof ResourceNotFoundException) {
             return new CfnNotFoundException(ResourceModel.TYPE_NAME, e.getMessage(), e);
+        }
+        if (e instanceof ResourceInUseException) {
+            return new CfnServiceInternalErrorException(ResourceModel.TYPE_NAME, e);
         }
         if (e instanceof DuplicateResourceException) {
             return new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, e.getMessage(), e);

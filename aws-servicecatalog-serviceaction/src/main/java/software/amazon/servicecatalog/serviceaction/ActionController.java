@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.servicecatalog.model.CreateServiceActionR
 import software.amazon.awssdk.services.servicecatalog.model.DeleteServiceActionRequest;
 import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionRequest;
 import software.amazon.awssdk.services.servicecatalog.model.DescribeServiceActionResponse;
+import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsRequest;
+import software.amazon.awssdk.services.servicecatalog.paginators.ListServiceActionsIterable;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionDetail;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionSummary;
 import software.amazon.awssdk.services.servicecatalog.model.UpdateServiceActionRequest;
@@ -28,6 +30,7 @@ public class ActionController {
     private static final String DELETE_SERVICE_ACTION_LOG = "Delete serviceAction with Id: %s";
     private static final String UPDATE_SERVICE_ACTION_LOG = "Update serviceAction with Id: %s";
     private static final String DESCRIBE_SERVICE_ACTION_LOG = "Describe serviceAcion with id: %s";
+    private static final String LIST_SERVICE_ACTIONS_LOG = "Listing all serviceAcions";
 
     private final Logger logger;
     private final ServiceCatalogClient scClient;
@@ -77,6 +80,19 @@ public class ActionController {
 
         logger.log(String.format(DESCRIBE_SERVICE_ACTION_LOG, id));
         return proxy.injectCredentialsAndInvokeV2(request, scClient::describeServiceAction);
+    }
+
+    public List<String> listAllServiceActionIds() {
+        final ListServiceActionsRequest request = ListServiceActionsRequest
+                .builder()
+                .pageToken(null)
+                .build();
+        logger.log(LIST_SERVICE_ACTIONS_LOG);
+        final ListServiceActionsIterable responses = proxy.injectCredentialsAndInvokeIterableV2(request, scClient::listServiceActionsPaginator);
+        return responses.stream()
+                .flatMap(r -> r.serviceActionSummaries().stream())
+                .map(ServiceActionSummary::id)
+                .collect(Collectors.toList());
     }
 
     private Map<String, String> buildServiceActionDefinition(final List<DefinitionParameter> definitions) {

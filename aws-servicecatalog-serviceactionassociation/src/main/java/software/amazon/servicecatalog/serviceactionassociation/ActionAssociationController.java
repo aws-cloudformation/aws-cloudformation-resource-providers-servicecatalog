@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsFo
 import software.amazon.awssdk.services.servicecatalog.model.ListServiceActionsForProvisioningArtifactResponse;
 import software.amazon.awssdk.services.servicecatalog.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.servicecatalog.model.ServiceActionSummary;
+import software.amazon.awssdk.services.servicecatalog.paginators.ListServiceActionsForProvisioningArtifactIterable;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -21,6 +22,7 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.servicecatalog.serviceactionassociation.model.UpdateAssociationStatus;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -34,6 +36,7 @@ public class ActionAssociationController {
     private static final String LIST_SERVICE_ACTION_LOG = "List service action associated to provisioningArtifact: %s of product: %s";
     private static final String SERVICE_ACTION_ASSOCIATED_TO_PA = "Service action: %s associated to provisioningArtifact: %s of product: %s";
     private static final String SERVICE_ACTION_NOT_ASSOCIATED_TO_PA = "Service action: %s not associated to provisioningArtifact: %s of product: %s";
+    private static final String LIST_ALL_SERVICE_ACTION_LOG = "List all service actions associated to provisioningArtifact: %s of product: %s";
 
     private final Logger logger;
     private final ServiceCatalogClient scClient;
@@ -85,6 +88,20 @@ public class ActionAssociationController {
                 .build();
         logger.log(String.format(DISASSOCIATE_SERVICE_ACTION_LOG, serviceActionId, provisioningArtifactId, productId));
         proxy.injectCredentialsAndInvokeV2(request, scClient::disassociateServiceActionFromProvisioningArtifact);
+    }
+
+    public List<String> listAllServiceActionIdsForProvisioningArtifact(final String productId, final String provisioningArtifactId) {
+        final ListServiceActionsForProvisioningArtifactRequest request = ListServiceActionsForProvisioningArtifactRequest.builder()
+                .productId(productId)
+                .provisioningArtifactId(provisioningArtifactId)
+                .pageToken(null)
+                .build();
+        logger.log(String.format(LIST_ALL_SERVICE_ACTION_LOG, provisioningArtifactId, productId));
+        final ListServiceActionsForProvisioningArtifactIterable responses = proxy.injectCredentialsAndInvokeIterableV2(request, scClient::listServiceActionsForProvisioningArtifactPaginator);
+        return responses.stream()
+                .flatMap(r -> r.serviceActionSummaries().stream())
+                .map(ServiceActionSummary::id)
+                .collect(Collectors.toList());
     }
 
     public UpdateAssociationStatus updateServiceActionAssociation(final ResourceModel previousModel, final ResourceModel desiredModel) {
